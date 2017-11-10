@@ -16,9 +16,9 @@
 TM1637 display(CLK, DIO);// // initialize the library for pins 2, 3
 int8_t Disp[4]; //Dimension of digits
 
-Button button1 = Button(2);
-Button button2 = Button(3);
-Button button3 = Button(4);
+Button button1 = Button(2, true, true, 25);	//25 ms debounce
+Button button2 = Button(3, true, true, 25);	//25 ms debounce
+Button button3 = Button(5, true, true, 25);	//25 ms debounce
 
 LED led1 = LED(12);
 LED led2 = LED(13);
@@ -35,6 +35,9 @@ void setup() {
 }
 
 void loop() {
+  button1.read();
+  button2.read();
+  button3.read();
   /*
   led1.update();
   led2.update();
@@ -53,7 +56,7 @@ void loop() {
   }
   */
 
-  if (button1.isPressed()) {
+  if (button1.wasPressed()) {
     if (brightness == 7) {
       brightness = 0;
     } else {
