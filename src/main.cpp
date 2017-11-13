@@ -1,8 +1,5 @@
 /**
- * Blink
- *
- * Turns on an LED on for one second,
- * then off for one second, repeatedly.
+ * Meditation timer
  */
 #include "Arduino.h"
 #include <DebounceButton.h>
@@ -13,33 +10,43 @@
 #define CLK 6
 #define DIO 7
 
-TM1637 display(CLK, DIO);// // initialize the library for pins 2, 3
+// 4 times 7-segment Display
+TM1637 display(CLK, DIO);
 
-int8_t* activeDigits;
-int8_t digitsToDisplay[4]; //Dimension of digits
+// Display's digits
+int8_t* activeDigits; // pointer to the digits or blank digits
+int8_t digitsToDisplay[4];
 uint8_t blankDigits[4] = {0x10, 0x10, 0x10, 0x10};
 
-int minutes = 5;
-int seconds = 0;
-
+// display's brightness
 int brightness = 0;
 
+// display's points (separator)
 boolean pointState = false;
 boolean displayShow = true;
 
+// timer - minutes and seconds
+int minutes = 5;
+int seconds = 0;
+
+// counter for delay
 unsigned long previousMillis = 0;
 
+// configure mode
 boolean configureMode = false;
 
+// buttons
 DebounceButton button1 = DebounceButton(2, DBTN_PULLDOWN, 50, 1000, 500);
 DebounceButton button2 = DebounceButton(3, DBTN_PULLDOWN, 50, 1000, 500);
 DebounceButton button3 = DebounceButton(4, DBTN_PULLDOWN, 50, 1000, 500);
 
+// leds
 LED led1 = LED(12);
 LED led2 = LED(13);
 
+// buids a 4-int array with minutes and seconds
+// (or with nothing at all to build a blank array for blinking)
 void buildDigitsArray(int minutes, int seconds) {
-
   if (minutes == 0 && seconds == 0) {
     digitsToDisplay[0] = digitsToDisplay[1] = digitsToDisplay[2] = digitsToDisplay[3] = 0x10;
   } else {
@@ -50,6 +57,7 @@ void buildDigitsArray(int minutes, int seconds) {
   }
 }
 
+// button 1 events
 void onHoldButton1(DebounceButton* btn) {
   configureMode = true;
 }
@@ -59,6 +67,7 @@ void onPressButton1(DebounceButton* btn) {
   };
 }
 
+// utility method for buttons 2 and 3 events
 int f(int time, int increment) {
   int t;
   if (configureMode) {
@@ -71,12 +80,15 @@ int f(int time, int increment) {
   return t;
 }
 
+// button 2 events
 void onClickButton2(DebounceButton* btn) {
   minutes = f(minutes, 1);
 }
 void onHoldButton2(DebounceButton* btn) {
   minutes = f(minutes, 10);
 }
+
+// button 3 events
 void onClickButton3(DebounceButton* btn) {
   seconds = f(seconds, 1);
 }
@@ -143,5 +155,5 @@ void loop() {
       led2.off();
     }
   }
-  display.display(activeDigits); //Show dimension(digits) to display
+  display.display(activeDigits);
 }
