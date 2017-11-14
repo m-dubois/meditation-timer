@@ -26,11 +26,16 @@ boolean pointState = false;
 boolean displayShow = true;
 
 // timer - minutes and seconds
-int minutes = 5;
-int seconds = 0;
+unsigned int minutes = 5;
+unsigned int seconds = 0;
 
-// counter for delay
-unsigned long previousMillis = 0;
+// variable retaining the previous time tag for points blinking
+unsigned long previousMillisPointBlinking = 0;
+const unsigned int POINT_BLINK_INTERVAL = 500;
+
+// variable retaining the previous time tag for time blinking
+unsigned long previousMillistimeBlinking = 0;
+const unsigned int TIME_BLINK_INTERVAL = 250;
 
 // configure mode
 boolean configureMode = false;
@@ -126,12 +131,17 @@ void loop() {
 
   unsigned long currentMillis = millis();
 
-  if (currentMillis - previousMillis >= 500) {
-    previousMillis = currentMillis;
+  if (currentMillis - previousMillisPointBlinking >= POINT_BLINK_INTERVAL) {
+    previousMillisPointBlinking = currentMillis;
 
     // blink points
     display.point(pointState);
     pointState = !pointState;
+
+  }
+
+  if (currentMillis - previousMillistimeBlinking >= TIME_BLINK_INTERVAL) {
+    previousMillistimeBlinking = currentMillis;
 
     buildDigitsArray(minutes, seconds);
     activeDigits = digitsToDisplay;
