@@ -29,13 +29,16 @@ boolean displayShow = true;
 unsigned int minutes = 5;
 unsigned int seconds = 0;
 
+// countdown running or not
+boolean countDown = false;
+
 // variable retaining the previous time tag for points blinking
 unsigned long previousMillisPointBlinking = 0;
 const unsigned int POINT_BLINK_INTERVAL = 500;
 
 // variable retaining the previous time tag for time blinking
-unsigned long previousMillistimeBlinking = 0;
-const unsigned int TIME_BLINK_INTERVAL = 250;
+unsigned long previousMillisTimeBlinking = 0;
+const unsigned int TIME_BLINK_INTERVAL = 100;
 
 // configure mode
 boolean configureMode = false;
@@ -55,6 +58,7 @@ void buildDigitsArray(int minutes, int seconds) {
   if (minutes == 0 && seconds == 0) {
     digitsToDisplay[0] = digitsToDisplay[1] = digitsToDisplay[2] = digitsToDisplay[3] = 0x10;
   } else {
+
     digitsToDisplay[0] = minutes / 10;
     digitsToDisplay[1] = minutes % 10;
     digitsToDisplay[2] = seconds / 10;
@@ -69,12 +73,14 @@ void onHoldButton1(DebounceButton* btn) {
 void onPressButton1(DebounceButton* btn) {
   if (configureMode) {
     configureMode = false;
+  } else {
+    countDown = !countDown;
   };
 }
 
 // utility method for buttons 2 and 3 events
 int f(int time, int increment) {
-  int t;
+  int t = time;
   if (configureMode) {
     if (time == 99) {
       t = 0;
@@ -140,8 +146,8 @@ void loop() {
 
   }
 
-  if (currentMillis - previousMillistimeBlinking >= TIME_BLINK_INTERVAL) {
-    previousMillistimeBlinking = currentMillis;
+  if (currentMillis - previousMillisTimeBlinking >= TIME_BLINK_INTERVAL) {
+    previousMillisTimeBlinking = currentMillis;
 
     buildDigitsArray(minutes, seconds);
     activeDigits = digitsToDisplay;
