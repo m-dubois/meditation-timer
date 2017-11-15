@@ -81,16 +81,12 @@ void onHoldButton1(DebounceButton* btn) {
     seconds = 5;
   }
 }
-void onReleaseButton1(DebounceButton* btn) {
-  Serial.println("release");
-  if (!configureMode) {
-    countDown = !countDown;
-  };
-}
-void onPressButton1(DebounceButton* btn) {
-  Serial.println("press");
+void onClickButton1(DebounceButton* btn) {
+  Serial.println("click");
   if (configureMode) {
     configureMode = false;
+  } else {
+    countDown = !countDown;
   };
 }
 
@@ -140,8 +136,7 @@ void setup() {
   digitsToDisplay[3] = 0;
 
   button1.onHold = onHoldButton1;
-  button1.onPress = onPressButton1;
-  button1.onRelease = onReleaseButton1;
+  button1.onClick = onClickButton1;
   button2.onClick = onClickButton2;
   button2.onHold = onHoldButton2;
   button3.onClick = onClickButton3;
