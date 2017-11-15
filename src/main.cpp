@@ -87,7 +87,9 @@ void onClickButton1(DebounceButton* btn) {
   if (configureMode) {
     configureMode = false;
   } else {
-    countDown = !countDown;
+    if (seconds > 0 || minutes > 0) {
+      countDown = !countDown;
+    }
   };
 }
 
