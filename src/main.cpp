@@ -38,13 +38,18 @@ const unsigned int POINT_BLINK_INTERVAL = 500;
 
 // variable retaining the previous time tag for time blinking
 unsigned long previousMillisTimeBlinking = 0;
-const unsigned int TIME_BLINK_INTERVAL = 100;
+const unsigned int TIME_BLINK_INTERVAL = 250;
+
+// countDown
+unsigned long previousMillisCountdown = 0;
+const unsigned int COUNTDOWN_INTERVAL = 1000;
+
 
 // configure mode
 boolean configureMode = false;
 
 // buttons
-DebounceButton button1 = DebounceButton(2, DBTN_PULLDOWN, 50, 1000, 500);
+DebounceButton button1 = DebounceButton(2, DBTN_PULLDOWN, 50, 1000, 3000);
 DebounceButton button2 = DebounceButton(3, DBTN_PULLDOWN, 50, 1000, 500);
 DebounceButton button3 = DebounceButton(4, DBTN_PULLDOWN, 50, 1000, 500);
 
@@ -68,13 +73,24 @@ void buildDigitsArray(int minutes, int seconds) {
 
 // button 1 events
 void onHoldButton1(DebounceButton* btn) {
-  configureMode = true;
+  Serial.println("hold");
+  if (!configureMode) {
+    configureMode = true;
+  } else {
+    minutes = 0;
+    seconds = 5;
+  }
+}
+void onReleaseButton1(DebounceButton* btn) {
+  Serial.println("release");
+  if (!configureMode) {
+    countDown = !countDown;
+  };
 }
 void onPressButton1(DebounceButton* btn) {
+  Serial.println("press");
   if (configureMode) {
     configureMode = false;
-  } else {
-    countDown = !countDown;
   };
 }
 
@@ -123,9 +139,9 @@ void setup() {
   digitsToDisplay[2] = 0;
   digitsToDisplay[3] = 0;
 
-  //button1.onClick = onClickButton1;
   button1.onHold = onHoldButton1;
   button1.onPress = onPressButton1;
+  button1.onRelease = onReleaseButton1;
   button2.onClick = onClickButton2;
   button2.onHold = onHoldButton2;
   button3.onClick = onClickButton3;
@@ -154,8 +170,12 @@ void loop() {
 
     if (configureMode) {
       if (displayShow) {
-        activeDigits = blankDigits;
+        brightness = 1;
+        //activeDigits = blankDigits;
+      } else {
+        brightness = 0;
       }
+      display.set(brightness); //Setup brightness 0 to 7
       displayShow = !displayShow;
     }
 
@@ -171,5 +191,14 @@ void loop() {
       led2.off();
     }
   }
+
+  if (currentMillis - previousMillisCountdown >= COUNTDOWN_INTERVAL) {
+    previousMillisCountdown = currentMillis;
+
+    if (countDown) {
+      minutes--;
+    }
+  }
+
   display.display(activeDigits);
 }
