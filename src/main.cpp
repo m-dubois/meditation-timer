@@ -49,7 +49,7 @@ const unsigned int COUNTDOWN_INTERVAL = 1000;
 boolean configureMode = false;
 
 // buttons
-DebounceButton button1 = DebounceButton(2, DBTN_PULLDOWN, 50, 1000, 3000);
+DebounceButton button1 = DebounceButton(2, DBTN_PULLDOWN, 50, 1000, 2000);
 DebounceButton button2 = DebounceButton(3, DBTN_PULLDOWN, 50, 1000, 500);
 DebounceButton button3 = DebounceButton(4, DBTN_PULLDOWN, 50, 1000, 500);
 
@@ -60,15 +60,10 @@ LED led2 = LED(13);
 // buids a 4-int array with minutes and seconds
 // (or with nothing at all to build a blank array for blinking)
 void buildDigitsArray(int minutes, int seconds) {
-  if (minutes == 0 && seconds == 0) {
-    digitsToDisplay[0] = digitsToDisplay[1] = digitsToDisplay[2] = digitsToDisplay[3] = 0x10;
-  } else {
-
-    digitsToDisplay[0] = minutes / 10;
-    digitsToDisplay[1] = minutes % 10;
-    digitsToDisplay[2] = seconds / 10;
-    digitsToDisplay[3] = seconds % 10;
-  }
+  digitsToDisplay[0] = minutes / 10;
+  digitsToDisplay[1] = minutes % 10;
+  digitsToDisplay[2] = seconds / 10;
+  digitsToDisplay[3] = seconds % 10;
 }
 
 // button 1 events
@@ -143,6 +138,33 @@ void setup() {
   button3.onHold = onHoldButton3;
 }
 
+void stepDownMinutes() {
+  if (minutes > 0) {
+    minutes--;
+  }
+}
+void stepDownSeconds() {
+
+  if (seconds > 0) {
+    seconds--;
+
+    if (seconds == 0 && minutes == 0) {
+      countDown = false;
+    }
+
+  } else {
+    stepDownMinutes();
+    if (countDown) {
+      seconds = 59;
+    }
+  }
+
+  Serial.print(minutes);
+  Serial.print(" ");
+  Serial.println(seconds);
+
+}
+
 void loop() {
   DebounceButton::updateAll();
 
@@ -191,7 +213,7 @@ void loop() {
     previousMillisCountdown = currentMillis;
 
     if (countDown) {
-      minutes--;
+      stepDownSeconds();
     }
   }
 
